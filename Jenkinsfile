@@ -59,7 +59,7 @@ pipeline {
                     az aks get-credentials --resource-group $RESOURCE_GROUP --name $AKS_CLUSTER --overwrite-existing
                     
                     echo "Deploying application to AKS..."
-                    kubectl apply -f deployment.yaml
+                    kubectl apply -f manifest.yml
                     
                     echo "Verifying deployment..."
                     kubectl get pods -n $NAMESPACE
