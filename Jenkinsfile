@@ -7,6 +7,8 @@ pipeline {
         ACR_NAME = 'dineshacr001'    
         IMAGE_NAME = 'python-app'
         IMAGE_TAG = 'latest'
+        AKS_CLUSTER = 'dinesh-cluster-01'
+        NAMESPACE = 'default'
     }
 
     stages {
@@ -46,6 +48,23 @@ pipeline {
                 echo "Pushing Docker Image to ACR..."
                 docker push $ACR_NAME.azurecr.io/$IMAGE_NAME:$IMAGE_TAG
                 '''
+            }
+        }
+        
+        stage('AKS Deployment') {
+            steps {
+                script {
+                    sh """
+                    echo "Fetching AKS credentials..."
+                    az aks get-credentials --resource-group $RESOURCE_GROUP --name $AKS_CLUSTER --overwrite-existing
+                    
+                    echo "Deploying application to AKS..."
+                    kubectl apply -f deployment.yaml
+                    
+                    echo "Verifying deployment..."
+                    kubectl get pods -n $NAMESPACE
+                    """
+                }
             }
         }
     }
